@@ -1,3 +1,0 @@
-
-class persona:
-    pass
