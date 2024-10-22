@@ -19,6 +19,23 @@ public class Hospital {
 
     public ArrayList<Usuario> listaUsuarios = new ArrayList<>();
     
+        public String obtenerDatosEnComun(Medico nuevoMedico) {
+            StringBuilder datosEnComun = new StringBuilder();
+            for (Medico medico : this.listaMedicos) {
+                if (medico.getNombre().equalsIgnoreCase(nuevoMedico.getNombre())) {
+                    datosEnComun.append("Nombre en común: ").append(medico.getNombre()).append("\n");
+                }
+                if (medico.getTelefono().equalsIgnoreCase(nuevoMedico.getTelefono())) {
+                    datosEnComun.append("Teléfono en común: ").append(medico.getTelefono()).append("\n");
+                }
+                if (medico.getRfc().equalsIgnoreCase(nuevoMedico.getRfc())) {
+                    datosEnComun.append("RFC en común: ").append(medico.getRfc()).append("\n");
+                }
+            }
+            return datosEnComun.toString();
+        }
+
+
     // Método para obtener administrador por ID
     public Administrador obtenerAdministradorPorId(String idAdmin) {
         for (Usuario usuario : this.listaUsuarios) {

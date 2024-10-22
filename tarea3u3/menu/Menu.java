@@ -142,9 +142,9 @@ public class Menu {
 
 
 
-    private void mostrarMenuAdmin(){
+    private void mostrarMenuAdmin() {
         int opcion = 0;
-        while(opcion != 12) { // Cambiado a 12 para acomodar la nueva opción de ver información personal
+        while(opcion != 13) { // Cambiado a 13 para acomodar la nueva opción de ver información personal
             System.out.println("Bienvenido al IMSS ");
             System.out.println("Introduzca la opción que desee:  ");
             System.out.println("1. Registrar paciente");
@@ -158,10 +158,9 @@ public class Menu {
             System.out.println("9. Mostrar paciente por ID");
             System.out.println("10. Mostrar Medico por ID");
             System.out.println("11. Mostrar Consultorio por ID");
-            System.out.println("12. Ver mi información personal"); // Nueva opción añadida
+            System.out.println("12. Ver mi información personal");
             System.out.println("13. Salir"); // Opción para salir
-            opcion =  Integer.parseInt(sc.nextLine());
-
+            opcion = Integer.parseInt(sc.nextLine());
             switch (opcion) {
                 case 1:
                     //P--{año actual}---{mes actual}{Longuitud pacientes =1}{1,2000}
@@ -209,9 +208,8 @@ public class Menu {
                     System.out.println("Paciente registrado exitosamente");
                     break;
 
-                case 2:
+                    case 2:
                     System.out.println("A elegido la opcion REGISTRAR MEDICO");
-
                     System.out.println("Ingrese el nombre del medico: ");
                     String nombreMedico = sc.nextLine();
                     System.out.println("Ingrese el apellido del medico: ");
@@ -223,10 +221,8 @@ public class Menu {
                     System.out.println("Ingresa dia de nacimiento:");
                     int diaMedico = Integer.parseInt(sc.nextLine());
                     LocalDate fechaNacimientoMedico = LocalDate.of(anioMedico, mesMedico, diaMedico);
-
                     //tarea 12
                     String telefonoMedico = null;
-
                     while (telefonoMedico == null) {
                         System.out.println("Ingrese el telefono del medico: ");
                         telefonoMedico = sc.nextLine();
@@ -235,7 +231,6 @@ public class Menu {
                             telefonoMedico = null;
                         }
                     }
-
                     String rfcMedico = null;
                     while (rfcMedico == null) {
                         System.out.println("Ingrese el RFC del medico: ");
@@ -245,12 +240,17 @@ public class Menu {
                             rfcMedico = null;
                         }
                     }
-
                     String idMedico = hospital.generarIDMedico(fechaNacimientoMedico.getYear(), apellidoMedico);
                     Medico medico = new Medico(idMedico, nombreMedico, apellidoMedico, fechaNacimientoMedico, telefonoMedico, rfcMedico);
-
+    
+                    // Llamar al método obtenerDatosEnComun
+                    String datosEnComun = hospital.obtenerDatosEnComun(medico);
+                    if (!datosEnComun.isEmpty()) {
+                        System.out.println("Datos en común encontrados:\n" + datosEnComun);
+                    }
+    
                     hospital.registrarMedico(medico);
-                    break;
+                    
 
                 case 3:
                     System.out.println("A elegido la opcion REGISTRAR CONSULTORIO");
