@@ -1,5 +1,6 @@
 package horario;
 
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -31,18 +32,5 @@ public class Horario {
 
     public String mostrarInfoHorario() {
         return "Inicio: " + timeFormat.format(inicio) + " - Fin: " + timeFormat.format(fin);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Horario horario = (Horario) obj;
-        return inicio.equals(horario.inicio) && fin.equals(horario.fin);
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 * inicio.hashCode() + fin.hashCode();
     }
 }

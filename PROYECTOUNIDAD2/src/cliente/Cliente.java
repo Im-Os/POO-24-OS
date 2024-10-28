@@ -1,8 +1,7 @@
-
 package cliente;
-
 import utils.Rol;
 import java.time.LocalDate;
+
 
 public class Cliente {
     private String id;
@@ -13,10 +12,9 @@ public class Cliente {
     private LocalDate fechaNacimiento;
     private String direccion;
     private String contraseña;
-    private String curp;
     private Rol rol;
 
-    public Cliente(String id, String nombre, String apellidos, String email, String telefono, LocalDate fechaNacimiento, String direccion, String contraseña, String curp) {
+    public Cliente(String id, String nombre, String apellidos, String email, String telefono, LocalDate fechaNacimiento, String direccion, String contraseña) {
         this.id = id;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -25,7 +23,6 @@ public class Cliente {
         this.fechaNacimiento = fechaNacimiento;
         this.direccion = direccion;
         this.contraseña = contraseña;
-        this.curp = curp;
         this.rol = Rol.CLIENTE;
     }
 
@@ -33,52 +30,52 @@ public class Cliente {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getNombre() {
         return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getApellidos() {
         return apellidos;
     }
 
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
-
     public String getEmail() {
         return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
     public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
     public String getDireccion() {
         return direccion;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
     }
 
     public void setDireccion(String direccion) {
@@ -93,14 +90,6 @@ public class Cliente {
         this.contraseña = contraseña;
     }
 
-    public String getCurp() {
-        return curp;
-    }
-
-    public void setCurp(String curp) {
-        this.curp = curp;
-    }
-
     public Rol getRol() {
         return rol;
     }
@@ -109,21 +98,11 @@ public class Cliente {
         this.rol = rol;
     }
 
-
-    public boolean esElegibleParaDescuento() {
-        LocalDate hoy = LocalDate.now();
-        return hoy.getMonth() == fechaNacimiento.getMonth();
-    }
-
     public String mostrarDatos() {
-        return "ID: " + id +
-               "\nNombre: " + nombre +
-               "\nApellidos: " + apellidos +
-               "\nEmail: " + email +
-               "\nTeléfono: " + telefono +
-               "\nFecha de Nacimiento: " + fechaNacimiento +
-               "\nDirección: " + direccion +
-               "\nCURP: " + curp +
-               "\nRol: " + rol;
+        return String.format(
+                "ID: %d\nNombre: %s\nApellidos: %s\nEmail: %s\nTeléfono: %s\nFecha de Nacimiento: %s\nDirección: %s",
+                id, nombre, apellidos, email, telefono, fechaNacimiento, direccion
+        );
     }
-}
+
+    }

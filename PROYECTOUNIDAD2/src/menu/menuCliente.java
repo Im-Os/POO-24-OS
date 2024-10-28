@@ -4,234 +4,190 @@ import cliente.Cliente;
 import gestionsistema.gestionSistema;
 import pelicula.Pelicula;
 import sala.Sala;
-import asiento.Asiento;
-import reservacion.Reservacion;
-import boleto.Boleto;
-import compra.Compra;
-import dulceria.Dulceria;
 import horario.Horario;
-
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
 
 public class menuCliente {
     private static Scanner sc = new Scanner(System.in);
-    private static gestionSistema sistema = new gestionSistema();
+    private static gestionSistema sistema;
 
-    public static void mostrarMenuCliente(Cliente cliente) {
+    public static void mostrarMenuCliente(Cliente cliente, gestionSistema sistemaActual) {
+        sistema = sistemaActual;
+        boolean salir = false;
 
+        while (!salir) {
+            System.out.println("\n=== MENÚ CLIENTE ===");
+            System.out.println("1. Ver cartelera");
+            System.out.println("2. Crear reservación");
+            System.out.println("3. Ver mis boletos");
+            System.out.println("4. Realizar compra");
+            System.out.println("5. Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+
+            int opcion = sc.nextInt();
+            sc.nextLine(); 
+
+            switch (opcion) {
+                case 1:
+                    verCartelera();
+                    break;
+                case 2:
+                    crearReservacion(cliente);
+                    break;
+                case 3:
+                    verMisBoletos(cliente);
+                    break;
+                case 4:
+                    realizarCompra(cliente);
+                    break;
+                case 5:
+                    salir = true;
+                    menuLogin.mostrarMenuPrincipal();
+                    break;
+                default:
+                    System.out.println("Opción no válida");
+            }
+        }
     }
 
     private static void verCartelera() {
-        List<Pelicula> peliculas = sistema.getPeliculas();
-        System.out.println("\nCartelera actual:");
-        for (Pelicula pelicula : peliculas) {
-            System.out.println(pelicula.mostrarDatos());
-            System.out.println("--------------------");
-        }
+        System.out.println("\n=== CARTELERA ACTUAL ===");
+        sistema.mostrarCartelera();
     }
 
-    public void crearReservacion(Cliente cliente) {
-        verCartelera();
-        Pelicula pelicula = seleccionarPelicula();
+    private static void crearReservacion(Cliente cliente) {
+        System.out.println("\n=== CREAR RESERVACIÓN ===");
 
-        Horario horario = seleccionarHorario(pelicula);
-        if (horario == null) return;
+        sistema.mostrarPeliculasDisponibles();
 
-        List<Sala> salasDisponibles = sistema.getSalasDisponibles(pelicula, horario);
-        if (salasDisponibles.isEmpty()) {
-            System.out.println("No hay salas disponibles para esta película y horario.");
-            return;
-        }
-
-        System.out.println("Salas disponibles:");
-        for (Sala sala : salasDisponibles) {
-            System.out.println(sala.mostrarInfoSala());
-        }
-
-        Sala salaSeleccionada = seleccionarSala(salasDisponibles);
-        if (salaSeleccionada == null) return;
-
-        List<Asiento> asientosSeleccionados = seleccionarAsientos(salaSeleccionada);
-        if (asientosSeleccionados.isEmpty()) {
-            System.out.println("No se seleccionaron asientos. La reservación ha sido cancelada.");
-            return;
-        }
-
-        Reservacion reservacion = sistema.crearReservacion(cliente, pelicula, salaSeleccionada, horario, asientosSeleccionados);
-        System.out.println("Reservación realizada con éxito. Detalles de la reservación:");
-        System.out.println(reservacion.mostrarInfoReservacion());
-    }
-
-    private static Pelicula seleccionarPelicula() {
-        while (true) {
-            System.out.print("Seleccione el ID de la película: ");
-            int idPelicula = leerEntero();
-            Pelicula pelicula = sistema.obtenerPeliculaPorId(idPelicula);
-            if (pelicula != null) {
-                // Mostrar información de la película y horarios disponibles
-                System.out.println(pelicula.mostrarDatos());
-                return pelicula;
-            }
-            System.out.println("Película no encontrada. Por favor, intente de nuevo.");
-        }
-    }
-
-    private static Horario seleccionarHorario(Pelicula pelicula) {
-        List<Horario> horarios = pelicula.getHorarios();
-        if (horarios.isEmpty()) {
-            System.out.println("No hay horarios disponibles para esta película.");
-            return null;
-        }
-
-        System.out.println("Horarios disponibles:");
-        for (int i = 0; i < horarios.size(); i++) {
-            System.out.println((i + 1) + ". " + horarios.get(i).mostrarInfoHorario());
-        }
-
-        while (true) {
-            System.out.print("Seleccione el número del horario: ");
-            int seleccion = leerEntero();
-            if (seleccion >= 1 && seleccion <= horarios.size()) {
-                return horarios.get(seleccion - 1);
-            }
-            System.out.println("Selección no válida. Por favor, intente de nuevo.");
-        }
-    }
-
-    private static Sala seleccionarSala(List<Sala> salasDisponibles) {
-        while (true) {
-            System.out.print("Seleccione el número de sala: ");
-            int numeroSala = leerEntero();
-            for (Sala sala : salasDisponibles) {
-                if (sala.getNumeroSala() == numeroSala) {
-                    return sala;
-                }
-            }
-            System.out.println("Sala no válida. Por favor, intente de nuevo.");
-        }
-    }
-
-    private static List<Asiento> seleccionarAsientos(Sala sala) {
-        List<Asiento> asientosSeleccionados = new ArrayList<>();
-        while (true) {
-            sala.imprimirMatrizAsientos();
-            System.out.print("Ingrese el número de asiento a reservar (0 para terminar): ");
-            int numeroAsiento = leerEntero();
-
-            if (numeroAsiento == 0) {
-                break;
-            }
-
-            if (sistema.verificarDisponibilidadAsiento(sala, numeroAsiento)) {
-                Asiento asiento = sala.getAsientos().get(numeroAsiento - 1);
-                asientosSeleccionados.add(asiento);
-                asiento.setDisponible(false);
-                System.out.println("Asiento " + numeroAsiento + " reservado.");
-            } else {
-                System.out.println("El asiento " + numeroAsiento + " no está disponible.");
-            }
-        }
-        return asientosSeleccionados;
-    }
-
-    private static void verReservaciones(Cliente cliente) {
-        List<Reservacion> reservacionesCliente = sistema.obtenerReservacionesPorCliente(cliente);
-        if (reservacionesCliente.isEmpty()) {
-            System.out.println("No tienes reservaciones activas.");
-        } else {
-            System.out.println("Tus reservaciones:");
-            for (Reservacion reservacion : reservacionesCliente) {
-                System.out.println(reservacion.mostrarInfoReservacion());
-                System.out.println("--------------------");
-            }
-        }
-    }
-
-    private static void comprarBoletos(Cliente cliente) {
-        verCartelera();
         System.out.print("Seleccione el ID de la película: ");
-        int idPelicula = leerEntero();
+        int idPelicula = sc.nextInt();
 
-        Pelicula pelicula = gestionSistema.obtenerPeliculaPorId(idPelicula);
+        Pelicula pelicula = sistema.obtenerPeliculaPorId(idPelicula);
         if (pelicula == null) {
             System.out.println("Película no encontrada.");
             return;
         }
 
-        List<Sala> salasDisponibles = sistema.getSalasPorPelicula(pelicula);
-        if (salasDisponibles.isEmpty()) {
-            System.out.println("No hay salas disponibles para esta película.");
-            return;
-        }
+        if (sistema.mostrarHorariosDisponibles(idPelicula)) {
+            System.out.print("Seleccione el ID del horario: ");
+            int idHorario = sc.nextInt();
 
-        System.out.println("Salas disponibles:");
-        for (Sala sala : salasDisponibles) {
-            System.out.println(sala.getNumeroSala() + ": " + sala.getCapacidad() + " asientos");
-        }
-
-        System.out.print("Seleccione el número de sala: ");
-        int numeroSala = leerEntero();
-
-        Sala salaSeleccionada = sistema.obtenerSalaPorNumero(numeroSala);
-        if (salaSeleccionada == null) {
-            System.out.println("Sala no encontrada.");
-            return;
-        }
-
-        List<Boleto> boletosComprados = new ArrayList<>();
-        List<Asiento> asientosSeleccionados = seleccionarAsientos(salaSeleccionada);
-
-        for (Asiento asiento : asientosSeleccionados) {
-            Boleto boleto = sistema.crearBoleto(cliente, pelicula, salaSeleccionada, asiento);
-            boletosComprados.add(boleto);
-            System.out.println("Boleto para el asiento " + asiento.getNumero() + " comprado.");
-        }
-
-        if (!boletosComprados.isEmpty()) {
-            System.out.println("\n¿Desea agregar productos de dulcería? (s/n)");
-            String respuesta = sc.nextLine();
-            List<Dulceria> productosComprados = new ArrayList<>();
-
-            if (respuesta.equalsIgnoreCase("s")) {
-                while (true) {
-                    sistema.mostrarProductosDulceria();
-                    System.out.print("Ingrese el nombre del producto a comprar (0 para terminar): ");
-                    String nombreProducto = sc.nextLine();
-
-                    if (nombreProducto.equals("0")) {
-                        break;
-                    }
-
-                    Dulceria producto = sistema.obtenerProductoDulceriaPorNombre(nombreProducto);
-                    if (producto != null) {
-                        productosComprados.add(producto);
-                        System.out.println("Producto agregado: " + producto);
-                    } else {
-                        System.out.println("Producto no encontrado.");
-                    }
-                }
+            Horario horario = null;
+            List<Horario> horarios = pelicula.getHorarios();
+            if (idHorario >= 0 && idHorario < horarios.size()) {
+                horario = horarios.get(idHorario);
+            } else {
+                System.out.println("Horario no válido.");
+                return;
             }
 
-            System.out.print("Ingrese el tipo de pago (Efectivo/Tarjeta): ");
-            String tipoPago = sc.nextLine();
+            // MOSTRAR SALA Y SELECCIONAR
+            if (sistema.mostrarSalasDisponibles(idPelicula, idHorario)) {
+                System.out.print("Seleccione el número de sala: ");
+                int numeroSala = sc.nextInt();
+                Sala sala = sistema.obtenerSalaPorNumero(numeroSala);
 
-            Compra compra = sistema.crearCompra(boletosComprados, productosComprados, tipoPago);
-            System.out.println("Compra realizada con éxito. ID de compra: " + compra.getId());
-            System.out.println(compra.mostrarInfoCompra());
-        } else {
-            System.out.println("No se compraron boletos. La compra ha sido cancelada.");
+                if (sala == null) {
+                    System.out.println("Sala no encontrada.");
+                    return;
+                }
+
+                // MATRIZ PARA ASIENTOS
+                sistema.mostrarMatrizAsientos(numeroSala);
+                System.out.print("¿Cuántos asientos desea reservar? ");
+                int cantidadAsientos = sc.nextInt();
+                sc.nextLine();
+
+                List<String> asientosSeleccionados = new ArrayList<>();
+                for (int i = 0; i < cantidadAsientos; i++) {
+                    System.out.print("Ingrese la posición del asiento " + (i+1) + " (ejemplo: A1): ");
+                    String posicionAsiento = sc.nextLine();
+                    asientosSeleccionados.add(posicionAsiento);
+                }
+
+                // CREAR RESERVACION
+                sistema.crearReservacion(cliente, pelicula, sala, horario, asientosSeleccionados);
+
+                System.out.println("\nReservación creada exitosamente.");
+                System.out.print("¿Desea realizar otra reservación? (S/N): ");
+                if (sc.nextLine().toUpperCase().equals("S")) {
+                    crearReservacion(cliente);
+                } else {
+                    realizarCompra(cliente);
+                }
+            }
         }
     }
 
-    public static int leerEntero() {
-        while (true) {
-            try {
-                return Integer.parseInt(sc.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.print("Por favor, ingrese un número válido: ");
+    private static void verMisBoletos(Cliente cliente) {
+        System.out.println("\n=== MIS BOLETOS ===");
+        sistema.mostrarBoletosCliente(cliente);
+    }
+
+    private static void realizarCompra(Cliente cliente) {
+        System.out.println("\n=== REALIZAR COMPRA ===");
+
+        if (!sistema.tieneReservacionPendiente(cliente)) {
+            System.out.println("No tiene reservaciones pendientes. Debe crear una reservación primero.");
+            return;
+        }
+
+        sistema.mostrarResumenReservacion(cliente);
+
+        System.out.print("¿Desea agregar productos de dulcería? (S/N): ");
+        if (sc.nextLine().toUpperCase().equals("S")) {
+            agregarProductosDulceria(cliente);
+        }
+
+        procesarPago(cliente);
+    }
+
+    private static void agregarProductosDulceria(Cliente cliente) {
+        boolean seguirComprando = true;
+
+        while (seguirComprando) {
+            sistema.mostrarProductosDulceria();
+
+            System.out.print("Seleccione el ID del producto (0 para terminar): ");
+            int idProducto = sc.nextInt();
+
+            if (idProducto == 0) {
+                seguirComprando = false;
+                continue;
             }
+
+            System.out.print("Cantidad: ");
+            int cantidad = sc.nextInt();
+            sc.nextLine();
+
+            sistema.agregarProductoACompra(cliente, idProducto, cantidad);
+
+            System.out.print("¿Desea agregar más productos? (S/N): ");
+            seguirComprando = sc.nextLine().toUpperCase().equals("S");
+        }
+    }
+
+    private static void procesarPago(Cliente cliente) {
+        double total = sistema.calcularTotalCompra(cliente);
+        System.out.println("\nTotal a pagar: $" + String.format("%.2f", total));
+
+        System.out.println("\nMétodos de pago disponibles:");
+        System.out.println("1. Tarjeta de crédito");
+        System.out.println("2. Tarjeta de débito");
+        System.out.println("3. Efectivo");
+        System.out.print("Seleccione el método de pago: ");
+
+        int metodoPago = sc.nextInt();
+        sc.nextLine();
+
+        if (sistema.procesarPago(cliente, metodoPago, total)) {
+            System.out.println("¡Compra realizada exitosamente!");
+            sistema.generarBoletos(cliente);
+        } else {
+            System.out.println("Error al procesar el pago. Por favor intente nuevamente.");
         }
     }
 }

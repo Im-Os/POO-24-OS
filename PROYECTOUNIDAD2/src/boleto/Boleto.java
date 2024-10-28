@@ -1,10 +1,11 @@
-
 package boleto;
 
 import asiento.Asiento;
 import cliente.Cliente;
 import pelicula.Pelicula;
 import sala.Sala;
+
+import java.util.Date;
 
 public class Boleto {
     private int id;
@@ -87,6 +88,7 @@ public class Boleto {
         this.tieneDescuento = tieneDescuento;
     }
 
+    // Método para mostrar la información completa del boleto
     public String mostrarInfoBoleto() {
         return "Boleto ID: " + getId() +
                 "\nPelícula: " + pelicula.getTitulo() +
@@ -98,3 +100,4 @@ public class Boleto {
                 "\nTiene Descuento: " + (isTieneDescuento() ? "Sí" : "No");
     }
 }
+

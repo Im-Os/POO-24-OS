@@ -1,64 +1,53 @@
 package menu;
-
-import compra.Compra;
 import gestionsistema.gestionSistema;
 import cliente.Cliente;
 import admin.Admin;
-import reservacion.Reservacion;
-import sala.Sala;
-import pelicula.Pelicula;
-import asiento.Asiento;
-
+import menu.menuCliente;
+import utils.Rol;
+import menu.menuAdmin;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 public class menuLogin {
+
     private static gestionSistema sistema = new gestionSistema();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void mostrarMenuPrincipal() {
-        boolean salir = false;
-        while (!salir) {
-            System.out.println("\nBienvenido a Cinepolis");
-            System.out.println("1. Cliente");
-            System.out.println("2. Administrador");
-            System.out.println("3. Salir");
-            System.out.print("Seleccione una opción: ");
+        System.out.println("Bienvenido a Cinepolis");
+        System.out.println("1. Cliente");
+        System.out.println("2. Administrador");
+        System.out.println("3. Salir");
+        System.out.print("Seleccione una opción: ");
 
-            int opcion = scanner.nextInt();
-            scanner.nextLine(); // Consumir el salto de línea
+        int opcion = scanner.nextInt();
+        scanner.nextLine();
 
-            switch (opcion) {
-                case 1:
-                    manejarCliente();
-                    break;
-                case 2:
-                    manejarAdmin();
-                    break;
-                case 3:
-                    System.out.println("Gracias por usar Cinepolis. ¡Hasta pronto!");
-                    salir = true;
-                    break;
-                default:
-                    System.out.println("Opción no válida. Por favor, intente de nuevo.");
-            }
+        switch (opcion) {
+            case 1:
+                manejarCliente();
+                break;
+            case 2:
+                manejarAdmin();
+                break;
+            case 3:
+                System.out.println("Gracias por usar Cinepolis. ¡Hasta pronto!");
+                System.exit(0);
+            default:
+                System.out.println("Opción no válida. Por favor, intente de nuevo.");
         }
     }
 
-    private static void manejarCliente() {
-        boolean volverAlMenuPrincipal = false;
-        while (!volverAlMenuPrincipal) {
+    public static void manejarCliente() {
+        while (true) {
             System.out.println("\n--- Área de Cliente ---");
             System.out.println("1. Iniciar sesión");
             System.out.println("2. Crear cuenta");
-            System.out.println("3. Ver disponibilidad de salas y asientos");
-            System.out.println("4. Reservar Asientos");
-            System.out.println("5. Consultar peliculas");
+            System.out.println("3. Volver al menú principal");
             System.out.print("Seleccione una opción: ");
 
             int opcion = scanner.nextInt();
-            scanner.nextLine(); // Consumir el salto de línea
+            scanner.nextLine(); 
 
             switch (opcion) {
                 case 1:
@@ -68,42 +57,15 @@ public class menuLogin {
                     crearCuentaCliente();
                     break;
                 case 3:
-                    comprarBoletos();
-                    break;
-                case 4:
-                    Asiento asiento = new Asiento();
-                    String datosAsiento = (String) asiento.mostrarInfoAsiento();
-                    System.out.println(datosAsiento);
-                    break;
-                case 5:
-                    Pelicula pelicula = new Pelicula();
-                    String datosPelicula = pelicula.mostrarDatos();
-                    System.out.println(datosPelicula); // Imprimir los datos de la película
-                    break;
-                case 6:
-                    volverAlMenuPrincipal = true;
-                default: System.out.println("Opción no válida. Por favor, intente de nuevo.");
-                break;
+                    return;
+                default:
+                    System.out.println("Opción no válida. Por favor, intente de nuevo.");
             }
         }
     }
 
-    private static void comprarBoletos() {
-        System.out.print("Ingrese el ID de la sala: ");
-        int idSala = scanner.nextInt();
-        scanner.nextLine(); // Consumir el salto de línea
-
-        // Crear la sala con valores ficticios
-        Sala sala = new Sala(idSala, idSala, 100, 20, 30, 5, 10);
-        sala.inicializarAsientos();
-
-        System.out.println("Asientos inicializados para la sala: " + sala.getNumeroSala());
-        sala.imprimirMatrizAsientos();
-    }
-
-    private static void manejarAdmin() {
-        boolean volverAlMenuPrincipal = false;
-        while (!volverAlMenuPrincipal) {
+    public static void manejarAdmin() {
+        while (true) {
             System.out.println("\n--- Área de Administrador ---");
             System.out.println("1. Iniciar sesión");
             System.out.println("2. Crear cuenta");
@@ -111,7 +73,7 @@ public class menuLogin {
             System.out.print("Seleccione una opción: ");
 
             int opcion = scanner.nextInt();
-            scanner.nextLine(); // Consumir el salto de línea
+            scanner.nextLine(); 
 
             switch (opcion) {
                 case 1:
@@ -121,8 +83,7 @@ public class menuLogin {
                     crearCuentaAdmin();
                     break;
                 case 3:
-                    volverAlMenuPrincipal = true;
-                    break;
+                    return;
                 default:
                     System.out.println("Opción no válida. Por favor, intente de nuevo.");
             }
@@ -140,18 +101,19 @@ public class menuLogin {
             Cliente cliente = sistema.buscarCliente(nombre, contraseña);
             if (cliente != null) {
                 System.out.println("Inicio de sesión exitoso. Bienvenido, " + cliente.getNombre() + "!");
-                menuCliente.mostrarMenuCliente(cliente);
+                menuCliente.mostrarMenuCliente(cliente, sistema);
                 return;
             } else {
                 intentos--;
                 if (intentos > 0) {
                     System.out.println("Usuario o contraseña incorrectos. Intentos restantes: " + intentos);
                 } else {
-                    System.out.println("Número máximo de intentos alcanzado. Volviendo al menú de cliente.");
+                    System.out.println("Número máximo de intentos alcanzado. Volviendo al menú principal.");
                 }
             }
         }
     }
+
 
     private static void crearCuentaCliente() {
         System.out.println("\n--- Crear nueva cuenta de cliente ---");
@@ -170,11 +132,9 @@ public class menuLogin {
         String direccion = scanner.nextLine();
         System.out.print("Contraseña: ");
         String contraseña = scanner.nextLine();
-        System.out.print("CURP: ");
-        String curp = scanner.nextLine();
 
         String id = sistema.generarIDCliente();
-        Cliente nuevoCliente = new Cliente(id, nombre, apellidos, email, telefono, fechaNacimiento, direccion, contraseña, curp);
+        Cliente nuevoCliente = new Cliente(id, nombre, apellidos, email, telefono, fechaNacimiento, direccion, contraseña);
         sistema.registrarCliente(nuevoCliente);
 
         System.out.println("Cuenta creada exitosamente. Su ID de cliente es: " + id);
@@ -191,14 +151,14 @@ public class menuLogin {
             Admin admin = sistema.buscarAdmin(nombre, contraseña);
             if (admin != null) {
                 System.out.println("Inicio de sesión exitoso. Bienvenido, Administrador " + admin.getName() + "!");
-                menuAdmin.mostrarMenuAdmin(admin);
+                menuAdmin.mostrarMenuAdmin(admin, sistema);
                 return;
             } else {
                 intentos--;
                 if (intentos > 0) {
                     System.out.println("Usuario o contraseña incorrectos. Intentos restantes: " + intentos);
                 } else {
-                    System.out.println("Número máximo de intentos alcanzado. Volviendo al menú de administrador.");
+                    System.out.println("Número máximo de intentos alcanzado. Volviendo al menú principal.");
                 }
             }
         }
@@ -226,4 +186,5 @@ public class menuLogin {
 
         System.out.println("Cuenta de administrador creada exitosamente. Su ID de administrador es: " + id);
     }
+
 }

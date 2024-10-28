@@ -9,19 +9,29 @@ public class Pago {
         this.metodoPago = metodoPago;
     }
 
-    public double getMonto() { return monto; }
-    public void setMonto(double monto) { this.monto = monto; }
-    public String getMetodoPago() { return metodoPago; }
-    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
+    public double getMonto() {
+        return monto;
+    }
+
+    public void setMonto(double monto) {
+        this.monto = monto;
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
 
     public boolean procesarPago() {
-        // Aquí se implementaría la lógica real de procesamiento de pago
-        // Por ahora, simplemente simularemos que el pago siempre es exitoso
-        System.out.println("Procesando pago de $" + monto + " con " + metodoPago);
+        // AQUI SE PUEDE SIMULAR EL POCESO DEL PAGO
+        // PARA FINES PRACTICOS, EL PAGO SIEMPRE VA A SER EXITOSO
         return true;
     }
 
     public String mostrarInfoPago() {
-        return "Monto: $" + getMonto() + " - Método de Pago: " + getMetodoPago() + " - Pago Procesado: " + (procesarPago() ? "Sí" : "No");
+        return "Monto: " + getMonto() + " - Método de Pago: " + getMetodoPago() + " - Pago Procesado: " + (procesarPago() ? "Sí" : "No");
     }
 }

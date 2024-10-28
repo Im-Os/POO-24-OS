@@ -1,5 +1,6 @@
 package pelicula;
 
+
 import horario.Horario;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class Pelicula {
     private String genero;
     private String titulo;
     private String clasificacion;
-    private int duracion; // En minutos
+    private int duracion;
     private String sinopsis;
     private List<Horario> horarios;
 
@@ -22,15 +23,8 @@ public class Pelicula {
         this.duracion = duracion;
         this.sinopsis = sinopsis;
         this.horarios = new ArrayList<>();
-    }
-
-    public Pelicula() {
 
     }
-
-
-
-    // Getters y setters
 
     public int getId() {
         return id;
@@ -87,17 +81,15 @@ public class Pelicula {
     public void setHorarios(List<Horario> horarios) {
         this.horarios = horarios;
     }
-
     public void agregarHorario(Horario horario) {
         this.horarios.add(horario);
     }
-
     public String mostrarDatos() {
         StringBuilder datos = new StringBuilder();
         datos.append(String.format(
                 "ID: %d\nGénero: %s\nTítulo: %s\nClasificación: %s\nDuración: %d min\nSinopsis: %s\nHorarios:\n",
                 id, genero, titulo, clasificacion, duracion, sinopsis));
-        if (horarios != null && !horarios.isEmpty()) {
+        if (horarios != null) { 
             for (Horario horario : horarios) {
                 datos.append(horario.mostrarInfoHorario()).append("\n");
             }
@@ -105,14 +97,11 @@ public class Pelicula {
             datos.append("No hay horarios disponibles.\n");
         }
         return datos.toString();
+
     }
 
-    @Override
     public String toString() {
         return "ID: " + id + ", Título: " + titulo;
     }
 
-    public boolean tieneHorariosDisponibles() {
-        return !horarios.isEmpty();
-    }
 }

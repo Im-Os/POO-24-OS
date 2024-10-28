@@ -1,5 +1,6 @@
 package cine;
 
+
 import sala.Sala;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class Cine {
         this.salas = salas;
     }
 
+    // Métodos para agregar y eliminar salas
     public void agregarSala(Sala sala) {
         this.salas.add(sala);
     }

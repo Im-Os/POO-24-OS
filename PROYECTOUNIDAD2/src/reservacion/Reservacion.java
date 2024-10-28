@@ -6,39 +6,25 @@ import pelicula.Pelicula;
 import sala.Sala;
 import horario.Horario;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 
 public class Reservacion {
-    private int id;
     private Cliente cliente;
     private Pelicula pelicula;
     private Sala sala;
     private Horario horario;
     private List<Asiento> asientosReservados;
     private boolean confirmada;
+    private double total;
 
-    public Reservacion(int id, Cliente cliente, Pelicula pelicula, Sala sala, Horario horario, List<Asiento> asientosReservados) {
-        this.id = id;
+    public Reservacion(Cliente cliente, Pelicula pelicula, List<Asiento> asientosReservados) {
         this.cliente = cliente;
         this.pelicula = pelicula;
-        this.sala = sala;
-        this.horario = horario;
-        this.asientosReservados = asientosReservados;
+        this.asientosReservados = asientosReservados != null ? asientosReservados : new ArrayList<>();
         this.confirmada = false;
-    }
-
-    public Reservacion() {
-
-    }
-
-    // Getters y setters
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        this.calcularTotal();
     }
 
     public Cliente getCliente() {
@@ -57,6 +43,32 @@ public class Reservacion {
         this.pelicula = pelicula;
     }
 
+    public List<Asiento> getAsientosReservados() {
+        return asientosReservados;
+    }
+
+    public void setAsientosReservados(List<Asiento> asientosReservados) {
+        this.asientosReservados = asientosReservados;
+        calcularTotal();
+    }
+
+    public boolean isConfirmada() {
+        return confirmada;
+    }
+
+    public void confirmarReservacion() {
+        this.confirmada = true;
+    }
+
+    public void cancelarReservacion() {
+        this.confirmada = false;
+        for (Asiento asiento : asientosReservados) {
+            asiento.setDisponible(true);
+        }
+        asientosReservados.clear();
+        calcularTotal();
+    }
+
     public Sala getSala() {
         return sala;
     }
@@ -73,38 +85,51 @@ public class Reservacion {
         this.horario = horario;
     }
 
-    public List<Asiento> getAsientosReservados() {
-        return asientosReservados;
+    public double getTotal() {
+        return total;
     }
 
-    public void setAsientosReservados(List<Asiento> asientosReservados) {
-        this.asientosReservados = asientosReservados;
-    }
 
-    public boolean isConfirmada() {
-        return confirmada;
-    }
 
-    public void confirmarReservacion() {
-        this.confirmada = true;
-    }
-
-    public void cancelarReservacion() {
-        this.confirmada = false;
-    }
-
-    public String mostrarInfoReservacion() {
-        StringBuilder info = new StringBuilder();
-        info.append("ID de Reservación: ").append(id).append("\n");
-        info.append("Cliente: ").append(cliente.getNombre()).append(" ").append(cliente.getApellidos()).append("\n");
-        info.append("Película: ").append(pelicula.getTitulo()).append("\n");
-        info.append("Sala: ").append(sala.getNumeroSala()).append("\n");
-        info.append("Horario: ").append(horario.mostrarInfoHorario()).append("\n");
-        info.append("Asientos Reservados: ");
-        for (Asiento asiento : asientosReservados) {
-            info.append(asiento.getNumero()).append(" ");
+    public void agregarAsiento(Asiento asiento) {
+        if (asiento != null && asiento.isDisponible()) {
+            asientosReservados.add(asiento);
+            asiento.setDisponible(false);
+            calcularTotal();
         }
-        info.append("\nConfirmada: ").append(confirmada ? "Sí" : "No");
-        return info.toString();
+    }
+
+    public void removerAsiento(Asiento asiento) {
+        if (asientosReservados.remove(asiento)) {
+            asiento.setDisponible(true);
+            calcularTotal();
+        }
+    }
+
+    private double calcularTotal() {
+        this.total = 0.0;
+        for (Asiento asiento : asientosReservados) {
+            double precioAsiento = asiento.getPrecio();
+            if (cliente != null && cliente.getFechaNacimiento().getMonth() == LocalDate.now().getMonth()) {
+                if (asiento.getTipo().equals("PREMIUM")) {
+                    precioAsiento *= 0.4;
+                } else if (asiento.getTipo().equals("VIP")) {
+                    precioAsiento *= 0.65;
+                }
+            }
+            this.total += precioAsiento;
+        }
+        return this.total;
+    }
+
+    @Override
+    public String toString() {
+        return "Cliente: " + cliente.getNombre() + " " + cliente.getApellidos() +
+                "\nPelícula: " + (pelicula != null ? pelicula.getTitulo() : "No seleccionada") +
+                "\nSala: " + (sala != null ? "Sala " + sala.getNumeroSala() : "No asignada") +
+                "\nHorario: " + (horario != null ? horario.mostrarInfoHorario() : "No seleccionado") +
+                "\nAsientos reservados: " + asientosReservados.size() +
+                "\nTotal: $" + String.format("%.2f", calcularTotal()) +
+                "\nEstado: " + (confirmada ? "Confirmada" : "Pendiente");
     }
 }
