@@ -59,64 +59,56 @@ public class menuCliente {
 
     private static void crearReservacion(Cliente cliente) {
         System.out.println("\n=== CREAR RESERVACIÓN ===");
-
+        
         sistema.mostrarPeliculasDisponibles();
-
+        
         System.out.print("Seleccione el ID de la película: ");
         int idPelicula = sc.nextInt();
-
+        
         Pelicula pelicula = sistema.obtenerPeliculaPorId(idPelicula);
-        if (pelicula == null) {
-            System.out.println("Película no encontrada.");
-            return;
-        }
-
-        if (sistema.mostrarHorariosDisponibles(idPelicula)) {
+        if (pelicula != null && sistema.mostrarHorariosDisponibles(idPelicula)) {
             System.out.print("Seleccione el ID del horario: ");
             int idHorario = sc.nextInt();
-
-            Horario horario = null;
-            List<Horario> horarios = pelicula.getHorarios();
-            if (idHorario >= 0 && idHorario < horarios.size()) {
-                horario = horarios.get(idHorario);
-            } else {
-                System.out.println("Horario no válido.");
-                return;
-            }
-
-            // MOSTRAR SALA Y SELECCIONAR
-            if (sistema.mostrarSalasDisponibles(idPelicula, idHorario)) {
+            Horario horario = sistema.obtenerHorarioPorId(pelicula, idHorario);
+            
+            if (horario != null && sistema.mostrarSalasDisponibles(idPelicula, idHorario)) {
                 System.out.print("Seleccione el número de sala: ");
                 int numeroSala = sc.nextInt();
                 Sala sala = sistema.obtenerSalaPorNumero(numeroSala);
-
-                if (sala == null) {
-                    System.out.println("Sala no encontrada.");
-                    return;
-                }
-
-                // MATRIZ PARA ASIENTOS
-                sistema.mostrarMatrizAsientos(numeroSala);
-                System.out.print("¿Cuántos asientos desea reservar? ");
-                int cantidadAsientos = sc.nextInt();
-                sc.nextLine();
-
-                List<String> asientosSeleccionados = new ArrayList<>();
-                for (int i = 0; i < cantidadAsientos; i++) {
-                    System.out.print("Ingrese la posición del asiento " + (i+1) + " (ejemplo: A1): ");
-                    String posicionAsiento = sc.nextLine();
-                    asientosSeleccionados.add(posicionAsiento);
-                }
-
-                // CREAR RESERVACION
-                sistema.crearReservacion(cliente, pelicula, sala, horario, asientosSeleccionados);
-
-                System.out.println("\nReservación creada exitosamente.");
-                System.out.print("¿Desea realizar otra reservación? (S/N): ");
-                if (sc.nextLine().toUpperCase().equals("S")) {
-                    crearReservacion(cliente);
-                } else {
-                    realizarCompra(cliente);
+                
+                if (sala != null) {
+                    sistema.mostrarMatrizAsientos(numeroSala);
+                    System.out.print("¿Cuántos asientos desea reservar? ");
+                    int cantidadAsientos = sc.nextInt();
+                    sc.nextLine();
+                    
+                    List<String> asientosSeleccionados = new ArrayList<>();
+                    for (int i = 0; i < cantidadAsientos; i++) {
+                        boolean asientoValido = false;
+                        while (!asientoValido) {
+                            System.out.print("Ingrese la posición del asiento " + (i+1) + " (ejemplo: A1): ");
+                            String posicionAsiento = sc.nextLine().toUpperCase();
+                            
+                            // Verificar si el asiento está disponible
+                            if (sistema.verificarDisponibilidadAsiento(sala, posicionAsiento)) {
+                                asientosSeleccionados.add(posicionAsiento);
+                                asientoValido = true;
+                            } else {
+                                System.out.println("El asiento " + posicionAsiento + " no está disponible. Por favor, seleccione otro.");
+                                sala.mostrarMatrizAsientos(); // Mostrar matriz actualizada
+                            }
+                        }
+                    }
+                    
+                    if (sistema.crearReservacion(cliente, pelicula, sala, horario, asientosSeleccionados)) {
+                        System.out.println("\nReservación creada exitosamente.");
+                        System.out.print("¿Desea realizar otra reservación? (S/N): ");
+                        if (sc.nextLine().toUpperCase().equals("S")) {
+                            crearReservacion(cliente);
+                        } else {
+                            realizarCompra(cliente);
+                        }
+                    }
                 }
             }
         }

@@ -12,15 +12,10 @@ import reservacion.Reservacion;
 import sala.Sala;
 import admin.Admin;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 import java.text.SimpleDateFormat;
-
-import java.util.List;
-import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.Month;
 
@@ -1137,37 +1132,49 @@ public class gestionSistema {
         return String.format("A%d%d%04d", anoActual, mesActual, numeroAleatorio);
     }
 
-    public void crearReservacion(Cliente cliente, Pelicula pelicula, Sala sala,
-                                 Horario horario, List<String> posicionesAsientos) {
-        List<Asiento> asientosReservados = new ArrayList<>();
-        double totalReservacion = 0.0;
-
-        for (String posicion : posicionesAsientos) {
-            Asiento asiento = obtenerAsientoPorPosicion(sala, posicion);
-            if (asiento != null && asiento.isDisponible()) {
-                asiento.setDisponible(false);
-                asientosReservados.add(asiento);
-
-                // Calcular precio con descuento si aplica
-                double precioAsiento = asiento.getPrecio();
-                if (esmesDeCumpleanos(cliente)) {
-                    if (asiento.getTipo().equals("PREMIUM")) {
-                        precioAsiento *= 0.4; // 60% descuento
-                    } else if (asiento.getTipo().equals("VIP")) {
-                        precioAsiento *= 0.65; // 35% descuento
-                    }
-                }
-                totalReservacion += precioAsiento;
+    public boolean crearReservacion(Cliente cliente, Pelicula pelicula, Sala sala, 
+                              Horario horario, List<String> posicionesAsientos) {
+    List<Asiento> asientosReservados = new ArrayList<>();
+    double totalReservacion = 0.0;
+    
+    // Primera verificación de disponibilidad
+    for (String posicion : posicionesAsientos) {
+        char fila = posicion.charAt(0);
+        int columna = Integer.parseInt(posicion.substring(1));
+        Asiento asiento = sala.obtenerAsiento(fila, columna);
+        
+        if (asiento == null || !asiento.isDisponible()) {
+            System.out.println("El asiento " + posicion + " ya no está disponible.");
+            // Liberar los asientos que ya se habían reservado
+            for (Asiento asientoReservado : asientosReservados) {
+                asientoReservado.setDisponible(true);
+            }
+            return false;
+        }
+        asientosReservados.add(asiento);
+    }
+    
+    // Si todos los asientos están disponibles, proceder con la reservación
+    for (Asiento asiento : asientosReservados) {
+        asiento.setDisponible(false);
+        double precioAsiento = asiento.getPrecio();
+        if (esmesDeCumpleanos(cliente)) {
+            if (asiento.getTipo().equals("PREMIUM")) {
+                precioAsiento *= 0.4; // 60% descuento
+            } else if (asiento.getTipo().equals("VIP")) {
+                precioAsiento *= 0.65; // 35% descuento
             }
         }
-
-        if (!asientosReservados.isEmpty()) {
-            Reservacion reservacion = new Reservacion(cliente, pelicula, asientosReservados);
-            reservacion.setSala(sala);
-            reservacion.setHorario(horario);
-            listaReservaciones.add(reservacion);
-        }
+        totalReservacion += precioAsiento;
     }
+    
+    Reservacion reservacion = new Reservacion(cliente, pelicula, asientosReservados);
+    reservacion.setSala(sala);
+    reservacion.setHorario(horario);
+    listaReservaciones.add(reservacion);
+    
+    return true;
+}
 
     private boolean esmesDeCumpleanos(Cliente cliente) {
         return cliente.getFechaNacimiento().getMonth() == LocalDate.now().getMonth();
@@ -1221,4 +1228,16 @@ public class gestionSistema {
         }
         return null;
     }
+
+    public boolean verificarDisponibilidadAsiento(Sala sala, String posicionAsiento) {
+    try {
+        char fila = posicionAsiento.charAt(0);
+        int columna = Integer.parseInt(posicionAsiento.substring(1));
+        Asiento asiento = sala.obtenerAsiento(fila, columna);
+        return asiento != null && asiento.isDisponible();
+    } catch (Exception e) {
+        System.out.println("Formato de posición de asiento inválido.");
+        return false;
+    }
+}
 }
